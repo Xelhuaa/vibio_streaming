@@ -17,7 +17,7 @@
                     @break
 
                     @default
-                        Featured Movies
+                        Featured
                 @endswitch
             @endif
         </h2>
