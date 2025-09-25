@@ -41,7 +41,7 @@
     <!-- Navbar -->
     <nav class="navbar bg-dark navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
         <div class="container">
-            <a class="navbar-brand" href="#">
+            <a class="navbar-brand" href="{{ route('dashboard') }}">
                 <img src="{{ asset('logo-navbar.png') }}" alt="Vibio Logo" class="logo-navbar">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll"
@@ -51,7 +51,7 @@
             <div class="collapse navbar-collapse" id="navbarScroll">
                 <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll" style="--bs-scroll-height: 100px;">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">
+                        <a class="nav-link active" aria-current="page" href="{{ route('dashboard') }}">
                             <i class="nav-icon fas fa-home"></i>
                             Home
                         </a>
@@ -93,11 +93,33 @@
                         </form>
                     </li>
                 </ul>
-                <!-- Tombol Login (buka modal) -->
-                <a class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#authModal">
-                    <i class="nav-icon fas fa-user"></i>
-                    Login
-                </a>
+
+                <!-- Auth button -->
+                @guest
+                    <!-- Kalau belum login -->
+                    <a class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#authModal">
+                        <i class="nav-icon fas fa-user"></i>
+                        Login
+                    </a>
+                @else
+                    <!-- Kalau sudah login -->
+                    <div class="dropdown">
+                        <a class="btn btn-outline-success dropdown-toggle" href="#" role="button" id="userMenu"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-circle"></i>
+                            {{ Auth::user()->name }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+                            <li><a class="dropdown-item" href="{{ route('profile.edit') }}">My Profile</a></li>
+                            <li>
+                                <form action="{{ route('logout') }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item">Logout</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                @endguest
             </div>
         </div>
     </nav>
@@ -110,21 +132,41 @@
                 <!-- LOGIN FORM -->
                 <div id="loginForm">
                     <h4 class="text-center mb-4">Welcome back!</h4>
-                    <form>
+                    <form method="POST" action="{{ route('login') }}">
+                        @csrf
+
+                        @if (session('status'))
+                            <div class="alert alert-info">{{ session('status') }}</div>
+                        @endif
+
                         <div class="mb-3">
                             <label class="form-label text-uppercase small">Email Address</label>
-                            <input type="email" class="form-control" placeholder="name@email.com">
+                            <input type="email" name="email"
+                                class="form-control @error('email') is-invalid @enderror" value="{{ old('email') }}"
+                                required autofocus>
+                            @error('email')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
+
                         <div class="mb-3">
                             <label class="form-label text-uppercase small">Password</label>
-                            <input type="password" class="form-control" placeholder="Password">
+                            <input type="password" name="password"
+                                class="form-control @error('password') is-invalid @enderror" required>
+                            @error('password')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
+
                         <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" id="rememberMe">
+                            <input class="form-check-input" type="checkbox" id="rememberMe" name="remember"
+                                @if (old('remember')) checked @endif>
                             <label class="form-check-label" for="rememberMe">Remember me</label>
                         </div>
+
                         <button type="submit" class="btn btn-danger w-100">Login</button>
                     </form>
+
                     <div class="text-center mt-3">
                         Don’t have an account?
                         <a href="#" id="showRegister">Register</a>
@@ -134,25 +176,47 @@
                 <!-- REGISTER FORM -->
                 <div id="registerForm" class="d-none">
                     <h4 class="text-center mb-4">Create an Account</h4>
-                    <form>
+
+                    <form method="POST" action="{{ route('register') }}">
+                        @csrf
+
                         <div class="mb-3">
                             <label class="form-label text-uppercase small">Your Name</label>
-                            <input type="text" class="form-control" placeholder="Name">
+                            <input type="text" name="name"
+                                class="form-control @error('name') is-invalid @enderror" value="{{ old('name') }}"
+                                required autofocus>
+                            @error('name')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
+
                         <div class="mb-3">
                             <label class="form-label text-uppercase small">Email Address</label>
-                            <input type="email" class="form-control" placeholder="name@email.com">
+                            <input type="email" name="email"
+                                class="form-control @error('email') is-invalid @enderror" value="{{ old('email') }}"
+                                required>
+                            @error('email')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
+
                         <div class="mb-3">
                             <label class="form-label text-uppercase small">Password</label>
-                            <input type="password" class="form-control" placeholder="Password">
+                            <input type="password" name="password"
+                                class="form-control @error('password') is-invalid @enderror" required>
+                            @error('password')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
+
                         <div class="mb-3">
                             <label class="form-label text-uppercase small">Confirm Password</label>
-                            <input type="password" class="form-control" placeholder="Confirm Password">
+                            <input type="password" name="password_confirmation" class="form-control" required>
                         </div>
+
                         <button type="submit" class="btn btn-danger w-100">Register</button>
                     </form>
+
                     <div class="text-center mt-3">
                         Have an account?
                         <a href="#" id="showLogin">Login</a>
@@ -165,21 +229,47 @@
 
     <!-- Content -->
     <div class="wrapper">
-        @yield('content')
+        <div class="continer">
+            @yield('content')
+        </div>
     </div>
-</body>
 
-<script>
-    document.getElementById("showRegister").addEventListener("click", function(e) {
-        e.preventDefault();
-        document.getElementById("loginForm").classList.add("d-none");
-        document.getElementById("registerForm").classList.remove("d-none");
-    });
-    document.getElementById("showLogin").addEventListener("click", function(e) {
-        e.preventDefault();
-        document.getElementById("registerForm").classList.add("d-none");
-        document.getElementById("loginForm").classList.remove("d-none");
-    });
-</script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var showRegister = document.getElementById('showRegister');
+            var showLogin = document.getElementById('showLogin');
+
+            if (showRegister) {
+                showRegister.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.getElementById('loginForm').classList.add('d-none');
+                    document.getElementById('registerForm').classList.remove('d-none');
+                });
+            }
+
+            if (showLogin) {
+                showLogin.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.getElementById('registerForm').classList.add('d-none');
+                    document.getElementById('loginForm').classList.remove('d-none');
+                });
+            }
+
+            @if ($errors->any())
+                var authModal = new bootstrap.Modal(document.getElementById('authModal'));
+                authModal.show();
+
+                @if (old('name'))
+                    document.getElementById('loginForm').classList.add('d-none');
+                    document.getElementById('registerForm').classList.remove('d-none');
+                @else
+                    document.getElementById('registerForm').classList.add('d-none');
+                    document.getElementById('loginForm').classList.remove('d-none');
+                @endif
+            @endif
+        });
+    </script>
+
+</body>
 
 </html>
