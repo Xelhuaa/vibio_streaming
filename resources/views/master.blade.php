@@ -36,12 +36,12 @@
     </style>
 </head>
 
-<body class="hold-transition sidebar-mini">
+<body class="hold-transition sidebar-mini" data-bs-theme="dark">
 
     <!-- Navbar -->
     <nav class="navbar bg-dark navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
         <div class="container">
-            <a class="navbar-brand" href="{{ route('dashboard') }}">
+            <a class="navbar-brand" href="{{ route('movies.index') }}">
                 <img src="{{ asset('logo-navbar.png') }}" alt="Vibio Logo" class="logo-navbar">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll"
@@ -51,48 +51,46 @@
             <div class="collapse navbar-collapse" id="navbarScroll">
                 <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll" style="--bs-scroll-height: 100px;">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{{ route('dashboard') }}">
+                        <a class="nav-link {{ request('type') == null ? 'active' : '' }}"
+                            href="{{ route('movies.index') }} ">
                             <i class="nav-icon fas fa-home"></i>
                             Home
                         </a>
                     </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                            aria-expanded="false">
+
+                    <li class="nav-item">
+                        <a class="nav-link {{ request('type') == 'movie' ? 'active' : '' }}"
+                            href="{{ route('movies.index', ['type' => 'movie']) }}">
                             <i class="nav-icon fas fa-film"></i>
                             Movies
                         </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Most Watched</a></li>
-                            <li><a class="dropdown-item" href="#">Quality</a></li>
-                            <li><a class="dropdown-item" href="#">New Release</a></li>
-                        </ul>
                     </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                            aria-expanded="false">
+
+                    <li class="nav-item">
+                        <a class="nav-link {{ request('type') == 'tv_show' ? 'active' : '' }}"
+                            href="{{ route('movies.index', ['type' => 'tv_show']) }}">
                             <i class="nav-icon fas fa-tv"></i>
                             TV Series
                         </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Most Watched</a></li>
-                            <li><a class="dropdown-item" href="#">Quality</a></li>
-                            <li><a class="dropdown-item" href="#">New Release</a></li>
-                        </ul>
                     </li>
+
                     <li class="nav-item">
-                        <form class="d-flex align-items-center" role="search">
+                        <form class="d-flex align-items-center" role="search" method="GET"
+                            action="{{ route('movies.index') }}">
                             <a class="btn btn-outline-success me-2" data-bs-toggle="collapse" href="#searchCollapse"
                                 role="button" aria-expanded="false" aria-controls="searchCollapse">
                                 <i class="fas fa-search"></i>
                             </a>
                             <div class="collapse" id="searchCollapse">
-                                <input class="form-control" type="search" placeholder="Enter Movie Title..."
-                                    aria-label="Search" />
+                                <input class="form-control" type="search" name="search"
+                                    placeholder="Enter Movie Title..." aria-label="Search"
+                                    value="{{ request('search') }}" />
                             </div>
                         </form>
                     </li>
+
                 </ul>
+
 
                 <!-- Auth button -->
                 @guest
